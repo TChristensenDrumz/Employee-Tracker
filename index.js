@@ -20,6 +20,9 @@ async function init() {
         case 'ADD ROLE':
             addRole();
             break;
+        case 'ADD EMPLOYEE':
+            addEmployee();
+            break;
     }
 }
 
@@ -80,6 +83,71 @@ function addRole() {
                 console.log("Role added");
             });
         });
+    });
+}
+
+function addEmployee() {
+    connection.query("SELECT * FROM role", function(err, role) {
+    connection.query("SELECT * FROM employee", function(err, emp) {
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: "What is the employee's first name?",
+                name: 'first_name'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's last name?",
+                name: 'last_name'
+            },
+            {
+                type: 'list',
+                message: "What is this employee's role?",
+                choices: function() {
+                    const options = [];
+                    for(let i = 0; i < role.length; i++) {
+                        options.push(role[i].title);
+                    }
+                    return options;
+                },
+                name: 'role'
+            },
+            {
+                type: 'list',
+                message: "Who is this employee's manager?",
+                choices: function() {
+                    const options = [];
+                    for(let i = 0; i < emp.length; i++) {
+                        options.push(emp[i].first_name + " " + emp[i].last_name);
+                    }
+                    options.push("No Manager");
+                    return options;
+                },
+                name: 'manager'
+            }
+        ]).then(answers => {
+            for(let i = 0; i < role.length; i++) {
+                if(answers.role === role[i].title) {
+                    answers.role_id = role[i].id;
+                }
+            }
+            for(let i = 0; i < emp.length; i++) {
+                if((answers.manager) === (emp[i].first_name + " " + emp[i].last_name)) {
+                    answers.manager_id = emp[i].id;
+                }
+            }
+            connection.query("INSERT INTO employee SET ?", {
+                first_name: answers.first_name,
+                last_name: answers.last_name,
+                role_id: answers.role_id,
+                manager_id: answers.manager_id
+            },
+            function(err, res) {
+                if (err) throw err;
+                console.log("Employee added");
+            });
+        });
+    });
     });
 }
 
