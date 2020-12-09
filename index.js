@@ -23,6 +23,15 @@ async function init() {
         case 'ADD EMPLOYEE':
             addEmployee();
             break;
+        case 'VIEW DEPARTMENTS':
+            viewDepartments();
+            break;
+        case 'VIEW ROLES':
+            viewRoles();
+            break;
+        case 'VIEW EMPLOYEES':
+            viewEmployees();
+            break;
     }
 }
 
@@ -149,6 +158,27 @@ function addEmployee() {
         });
     });
     });
+}
+
+function viewDepartments() {
+    connection.query("SELECT * FROM department", function(err, data) {
+        if (err) throw err;
+        console.table(data);
+    })
+}
+
+function viewRoles() {
+    connection.query("SELECT * FROM role", function(err, data) {
+        if (err) throw err;
+        console.table(data);
+    })
+}
+
+function viewEmployees() {
+    connection.query("SELECT * FROM employee", function(err, data) {
+        if (err) throw err;
+        console.table(data);
+    })
 }
 
 init();
