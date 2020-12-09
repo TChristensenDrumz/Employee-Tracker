@@ -32,6 +32,12 @@ async function init() {
         case 'VIEW EMPLOYEES':
             viewEmployees();
             break;
+        case 'UPDATE EMPLOYEE ROLE':
+            updateEmployeeRole();
+            break;
+        default:
+            connection.end();
+            break;
     }
 }
 
@@ -46,6 +52,7 @@ function addDepartment() {
         connection.query("INSERT INTO department SET ?", { name: answers.department }, function(err, data) {
             if (err) throw err;
             console.log("Department added");
+            init();
         });
     });
 }
@@ -90,6 +97,7 @@ function addRole() {
             function(err, res) {
                 if (err) throw err;
                 console.log("Role added");
+                init();
             });
         });
     });
@@ -154,6 +162,7 @@ function addEmployee() {
             function(err, res) {
                 if (err) throw err;
                 console.log("Employee added");
+                init();
             });
         });
     });
@@ -164,6 +173,7 @@ function viewDepartments() {
     connection.query("SELECT * FROM department", function(err, data) {
         if (err) throw err;
         console.table(data);
+        init();
     })
 }
 
@@ -171,6 +181,7 @@ function viewRoles() {
     connection.query("SELECT * FROM role", function(err, data) {
         if (err) throw err;
         console.table(data);
+        init();
     })
 }
 
@@ -178,7 +189,65 @@ function viewEmployees() {
     connection.query("SELECT * FROM employee", function(err, data) {
         if (err) throw err;
         console.table(data);
+        init();
     })
+}
+
+function updateEmployeeRole() {
+    connection.query("SELECT * FROM role", function(err, role) {
+    connection.query("SELECT * FROM employee", function(err, emp) {
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: "Which employee's role are you changing?",
+                choices: function() {
+                    const options = [];
+                    for(let i = 0; i < emp.length; i++) {
+                        options.push(emp[i].first_name + " " + emp[i].last_name);
+                    }
+                    return options;
+                },
+                name: 'employee'
+            },
+            {
+                type: 'list',
+                message: "What is this employee's new role?",
+                choices: function() {
+                    const options = [];
+                    for(let i = 0; i < role.length; i++) {
+                        options.push(role[i].title);
+                    }
+                    return options;
+                },
+                name: 'role'
+            }
+        ]).then(answers => {
+            for(let i = 0; i < role.length; i++) {
+                if(answers.role === role[i].title) {
+                    answers.role_id = role[i].id;
+                }
+            }
+            for(let i = 0; i < emp.length; i++) {
+                if((answers.employee) === (emp[i].first_name + " " + emp[i].last_name)) {
+                    answers.employee_id = emp[i].id;
+                }
+            }
+            connection.query("UPDATE employee SET ? WHERE ?", [
+                {
+                    role_id: answers.role_id
+                },
+                {
+                    id: answers.employee_id
+                }
+            ],
+            function(err, res) {
+                if (err) throw err;
+                console.log("Employee role updated");
+                init();
+            });
+        });
+    });
+    });
 }
 
 init();
