@@ -19,7 +19,7 @@ This application is an interface that make it easy for non-developers to view an
 All dependincies are included, use "npm i" in your bash/terminal to install node modules.
 
 ## Usage
-Refer to the tutorial link for usage.
+Refer to the tutorial link for usage. https://drive.google.com/file/d/1Dg2J-x4Hl4OzK1umgl3iuJDgalnsf4tR/view
 
 ## License
 This project is not covered under a license.
